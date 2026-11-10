@@ -24,12 +24,15 @@ import {
   Target,
   TrendingUp,
 } from "lucide-react";
+import type { Metadata } from "next";
 import { FaqTabs } from "@/components/faq-tabs";
+import { JsonLd } from "@/components/json-ld";
+import { FAQ_GROUPS } from "@/lib/faq";
+import { ADDRESS, CITY, MAPS_URL, OG_BASE, PHONE_INTL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, STREET, WA_DAFTAR, WA_DISPLAY, wa } from "@/lib/site";
 import { ProgramExplorer } from "@/components/program-explorer";
 import { Testimonials } from "@/components/testimonials";
 import { Check, SectionTitle, WaButton, delay, stagger } from "@/components/site-ui";
 import { buttonVariants } from "@/components/ui/button";
-import { ADDRESS, MAPS_URL, WA_DAFTAR, WA_DISPLAY, wa } from "@/lib/site";
 import { cn } from "@/lib/utils";
 
 const HERO_FACTS = [
@@ -91,9 +94,65 @@ const REG_DATA = [
   "Program & pilihan kelas (Reguler/Privat)",
 ];
 
+export const metadata: Metadata = {
+  title: { absolute: "Les Privat SD & SMP di Banyuwangi | RH Cemerlang" },
+  description: SITE_DESCRIPTION,
+  alternates: { canonical: "/" },
+  openGraph: {
+    ...OG_BASE,
+    title: "Les Privat SD & SMP di Banyuwangi | RH Cemerlang",
+    description: "Anak paham pelajarannya, Ayah & Bunda tenang memantau perkembangannya. Calistung, Kelas 3-6 SD, Kelas 7-9 SMP, dan TKA. Konsultasi gratis via WhatsApp.",
+    url: "/",
+  },
+};
+
+// Structured data: bisnis lokal + program + FAQ. Hanya berisi fakta yang juga tampil di halaman.
+const ORG_ID = `${SITE_URL}/#organization`;
+const PROGRAM_SCHEMA = [
+  { name: "Calistung", description: "Belajar membaca, menulis, dan berhitung untuk anak yang baru mulai, kelas 1-2 SD." },
+  { name: "Les Kelas 3-6 SD", description: "Pendampingan mapel umum sekolah dasar, bantuan PR, dan penguatan konsep dasar." },
+  { name: "Les Kelas 7-9 SMP", description: "Fokus Matematika, Bahasa Inggris, dan IPA untuk siswa SMP." },
+  { name: "Persiapan TKA", description: "Latihan soal dan pembahasan terarah untuk Tes Kemampuan Akademik, bisa untuk siswa kelas berapa pun." },
+];
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": ["EducationalOrganization", "LocalBusiness"],
+      "@id": ORG_ID,
+      name: `${SITE_NAME} Rumah Belajar`,
+      alternateName: ["Rumbel RH Cemerlang", "RHC", "RH Cemerlang"],
+      description: SITE_DESCRIPTION,
+      slogan: "Bikin kamu paham, bukan sekedar hafal.",
+      url: SITE_URL,
+      logo: `${SITE_URL}/icon.png`,
+      image: [`${SITE_URL}/images/hero.webp`, `${SITE_URL}/images/ortu.webp`],
+      telephone: PHONE_INTL,
+      address: { "@type": "PostalAddress", streetAddress: STREET, addressLocality: CITY, addressRegion: "Jawa Timur", addressCountry: "ID" },
+      areaServed: { "@type": "City", name: "Banyuwangi" },
+      knowsLanguage: ["id", "en"],
+      contactPoint: { "@type": "ContactPoint", telephone: PHONE_INTL, contactType: "customer service", availableLanguage: ["Indonesian"] },
+      hasOfferCatalog: {
+        "@type": "OfferCatalog",
+        name: "Program Belajar",
+        itemListElement: PROGRAM_SCHEMA.map((p) => ({
+          "@type": "Offer",
+          itemOffered: { "@type": "Course", name: p.name, description: p.description, provider: { "@id": ORG_ID }, inLanguage: "id" },
+        })),
+      },
+    },
+    { "@type": "WebSite", "@id": `${SITE_URL}/#website`, url: SITE_URL, name: SITE_NAME, inLanguage: "id-ID", publisher: { "@id": ORG_ID } },
+    {
+      "@type": "FAQPage",
+      mainEntity: FAQ_GROUPS.flatMap((g) => g.items).map((f) => ({ "@type": "Question", name: f.q, acceptedAnswer: { "@type": "Answer", text: f.a } })),
+    },
+  ],
+};
+
 export default function Home() {
   return (
     <>
+      <JsonLd data={STRUCTURED_DATA} />
       <main className="flex-1 overflow-x-clip">
         {/* Hero */}
         <section className="doodle relative overflow-hidden">

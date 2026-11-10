@@ -1,14 +1,56 @@
 import type { Metadata } from "next";
 import Image from "next/image";
 import { ArrowDown, BookOpenCheck, CalendarClock, ClipboardList, GraduationCap, HeartHandshake, Megaphone, NotebookPen, Pencil, Sparkles, Wallet } from "lucide-react";
+import { JsonLd } from "@/components/json-ld";
 import { ApplyForm, QualificationCheck } from "@/components/karir-apply";
+import { CITY, OG_BASE, SITE_NAME, SITE_URL, STREET } from "@/lib/site";
 import { SectionTitle, delay, stagger } from "@/components/site-ui";
 import { buttonVariants } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
 
 export const metadata: Metadata = {
-  title: "Karier Tentor | RH Cemerlang Banyuwangi",
-  description: "Open recruitment tentor SD & SMP di RH Cemerlang Banyuwangi. Minimal S1 semua jurusan, jadwal fleksibel, penghasilan kompetitif. Lamar langsung via WhatsApp.",
+  title: "Lowongan Tentor SD & SMP di Banyuwangi",
+  description:
+    "Lowongan tentor les SD & SMP di Banyuwangi. Minimal S1 semua jurusan, jadwal fleksibel, penghasilan kompetitif. Lamar langsung via WhatsApp.",
+  alternates: { canonical: "/karir" },
+  openGraph: {
+    ...OG_BASE,
+    title: "Lowongan Tentor SD & SMP di Banyuwangi | RH Cemerlang",
+    description: "Jadi tentor RH Cemerlang: mengajar SD & SMP, jadwal fleksibel, penghasilan kompetitif. Lamar via WhatsApp.",
+    url: "/karir",
+  },
+};
+
+// JobPosting untuk Google for Jobs. datePosted = tanggal halaman ini terbit; tanpa validThrough karena tenggat di poster sudah lewat.
+const STRUCTURED_DATA = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "JobPosting",
+      title: "Tentor Les SD & SMP",
+      description:
+        "<p>RH Cemerlang Rumah Belajar membuka lowongan tentor untuk mengajar siswa SD dan SMP di Banyuwangi.</p>" +
+        "<p><b>Tugas:</b> mengajar siswa SD & SMP, membantu siswa memahami materi dan mengerjakan PR, memberikan laporan perkembangan belajar siswa.</p>" +
+        "<p><b>Kualifikasi:</b> minimal S1 semua jurusan; menguasai mapel SD & SMP; sabar, ramah, dan menyukai anak-anak; bertanggung jawab, disiplin, dan komunikatif; berdomisili di area penempatan; memiliki kendaraan pribadi (diutamakan).</p>" +
+        "<p><b>Keuntungan:</b> penghasilan kompetitif, jadwal fleksibel, lingkungan kerja positif.</p>",
+      datePosted: "2026-11-10",
+      educationRequirements: { "@type": "EducationalOccupationalCredential", credentialCategory: "bachelor degree" },
+      hiringOrganization: { "@type": "Organization", name: `${SITE_NAME} Rumah Belajar`, sameAs: SITE_URL, logo: `${SITE_URL}/icon.png` },
+      jobLocation: {
+        "@type": "Place",
+        address: { "@type": "PostalAddress", streetAddress: STREET, addressLocality: CITY, addressRegion: "Jawa Timur", addressCountry: "ID" },
+      },
+      directApply: true,
+      url: `${SITE_URL}/karir`,
+    },
+    {
+      "@type": "BreadcrumbList",
+      itemListElement: [
+        { "@type": "ListItem", position: 1, name: "Beranda", item: SITE_URL },
+        { "@type": "ListItem", position: 2, name: "Karier", item: `${SITE_URL}/karir` },
+      ],
+    },
+  ],
 };
 
 // Sumber: poster Open Recruitment Tentor
@@ -27,6 +69,7 @@ const PERKS = [
 export default function KarirPage() {
   return (
     <main className="flex-1 overflow-x-clip">
+      <JsonLd data={STRUCTURED_DATA} />
       {/* Hero */}
       <section className="doodle relative overflow-hidden">
         <div className="mx-auto grid max-w-6xl items-center gap-12 px-4 pt-8 pb-16 sm:pt-12 md:px-6 lg:grid-cols-2 lg:gap-10 lg:pt-16 lg:pb-24">

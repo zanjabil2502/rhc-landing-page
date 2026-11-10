@@ -10,12 +10,13 @@ import { cn } from "@/lib/utils";
 // Kelas 1-9 sesuai pilihan "Kelas Anak Saat Ini" di formulir pendaftaran.
 const GRADES = [1, 2, 3, 4, 5, 6, 7, 8, 9].map((g) => ({ value: g, label: g <= 6 ? `${g} SD` : `${g} SMP` }));
 
-// ponytail: pemetaan kelas -> program. Calistung untuk kelas 1-2, TKA untuk kelas 6 & 9 (tahun ujian).
+// Pemetaan kelas -> program reguler. Calistung untuk kelas 1-2.
+// TKA tidak terikat kelas (anyGrade): bisa ditambahkan untuk anak kelas berapa pun lewat pilihan "+ Persiapan TKA".
 const PROGRAMS = [
-  { tag: "A", title: "Calistung", grades: [1, 2], forWho: "Anak yang mulai belajar membaca, menulis, dan berhitung.", focus: ["Mengenal huruf & membaca", "Menulis", "Berhitung dasar"], img: "/images/prog-calistung.webp", tone: "orange" },
-  { tag: "B", title: "Kelas 3-6 SD", grades: [3, 4, 5, 6], forWho: "Siswa SD kelas 3 sampai 6.", focus: ["Mapel umum sekolah", "Pendampingan PR", "Penguatan konsep dasar"], img: "/images/prog-sd.webp", tone: "teal" },
-  { tag: "C", title: "Kelas 7-9 SMP", grades: [7, 8, 9], forWho: "Siswa SMP kelas 7 sampai 9.", focus: ["Matematika", "Bahasa Inggris", "IPA"], img: "/images/prog-smp.webp", tone: "yellow" },
-  { tag: "D", title: "TKA", grades: [6, 9], forWho: "Siswa yang menyiapkan Tes Kemampuan Akademik.", focus: ["Latihan soal", "Pembahasan", "Strategi mengerjakan"], img: "/images/prog-tka.webp", tone: "purple" },
+  { tag: "A", title: "Calistung", grades: [1, 2], anyGrade: false, forWho: "Anak yang mulai belajar membaca, menulis, dan berhitung.", focus: ["Mengenal huruf & membaca", "Menulis", "Berhitung dasar"], img: "/images/prog-calistung.webp", tone: "orange" },
+  { tag: "B", title: "Kelas 3-6 SD", grades: [3, 4, 5, 6], anyGrade: false, forWho: "Siswa SD kelas 3 sampai 6.", focus: ["Mapel umum sekolah", "Pendampingan PR", "Penguatan konsep dasar"], img: "/images/prog-sd.webp", tone: "teal" },
+  { tag: "C", title: "Kelas 7-9 SMP", grades: [7, 8, 9], anyGrade: false, forWho: "Siswa SMP kelas 7 sampai 9.", focus: ["Matematika", "Bahasa Inggris", "IPA"], img: "/images/prog-smp.webp", tone: "yellow" },
+  { tag: "D", title: "TKA", grades: [], anyGrade: true, forWho: "Siswa kelas berapa pun yang ingin menyiapkan Tes Kemampuan Akademik.", focus: ["Latihan soal", "Pembahasan", "Strategi mengerjakan"], img: "/images/prog-tka.webp", tone: "purple" },
 ] as const;
 
 const TONE = {
@@ -35,13 +36,16 @@ type ClassType = (typeof CLASS_TYPES)[number]["value"];
 export function ProgramExplorer() {
   const [grade, setGrade] = useState<number | null>(null);
   const [type, setType] = useState<ClassType>("Reguler");
+  const [withTka, setWithTka] = useState(false);
 
   const gradeLabel = GRADES.find((g) => g.value === grade)?.label;
-  const matched = grade ? PROGRAMS.filter((p) => (p.grades as readonly number[]).includes(grade)) : [];
-  const names = matched.map((p) => p.title).join(" dan ");
+  const matched = PROGRAMS.filter((p) => (grade !== null && (p.grades as readonly number[]).includes(grade)) || (p.anyGrade && withTka));
+  const names = matched.map((p) => p.title).join(" + ");
   const message = grade
     ? `Halo admin RH Cemerlang, anak saya kelas ${gradeLabel}. Saya tertarik program ${names} dengan kelas ${type}. Boleh minta info jadwal dan biayanya?`
-    : `Halo admin RH Cemerlang, saya ingin tanya program les dengan kelas ${type} untuk anak saya.`;
+    : withTka
+      ? `Halo admin RH Cemerlang, saya tertarik program persiapan TKA dengan kelas ${type} untuk anak saya. Boleh minta info jadwal dan biayanya?`
+      : `Halo admin RH Cemerlang, saya ingin tanya program les dengan kelas ${type} untuk anak saya.`;
 
   return (
     <>
@@ -78,6 +82,22 @@ export function ProgramExplorer() {
           })}
         </div>
 
+        {/* TKA bisa untuk semua kelas: pilihan tambahan, bukan bagian dari pemetaan kelas */}
+        <button
+          type="button"
+          role="checkbox"
+          aria-checked={withTka}
+          onClick={() => setWithTka((v) => !v)}
+          className={cn(
+            "mt-3 inline-flex h-11 items-center gap-2 rounded-full border-2 border-dashed px-4 font-extrabold transition-all active:scale-95",
+            withTka ? "border-purple bg-purple text-white shadow-[0_4px_0_var(--color-purple-600)]" : "border-purple/50 bg-purple/5 text-purple hover:border-purple",
+          )}
+        >
+          <span className={cn("grid size-5 place-items-center rounded-full border-2 text-xs", withTka ? "border-white bg-white text-purple" : "border-purple")}>{withTka ? "✓" : "+"}</span>
+          Persiapan TKA
+          <span className={cn("text-xs font-bold", withTka ? "text-white/80" : "text-purple/70")}>(semua kelas)</span>
+        </button>
+
         <div role="radiogroup" aria-label="Pilihan kelas" className="mt-5 grid gap-3 sm:grid-cols-2">
           {CLASS_TYPES.map(({ value, icon: Icon, desc }) => {
             const active = type === value;
@@ -113,6 +133,11 @@ export function ProgramExplorer() {
             {grade ? (
               <>
                 Untuk anak <b>kelas {gradeLabel}</b>, program yang cocok: <b className="text-brand-orange-600">{names}</b> (kelas {type}).
+                {!withTka && <> Mau sekalian persiapan TKA? Centang pilihan di atas.</>}
+              </>
+            ) : withTka ? (
+              <>
+                Program <b className="text-brand-orange-600">TKA</b> bisa untuk anak kelas berapa pun (kelas {type}). Pilih kelas anak untuk melihat program pendampingannya juga.
               </>
             ) : (
               <>Belum pilih kelas? Tidak apa-apa, admin kami siap membantu memilihkan.</>
@@ -124,7 +149,7 @@ export function ProgramExplorer() {
             rel="noopener noreferrer"
             className={cn(buttonVariants(), "pop h-11 w-full shrink-0 rounded-full px-5 font-extrabold sm:w-auto")}
           >
-            <MessageCircle className="size-5" /> {grade ? "Tanya program ini" : "Tanya admin"}
+            <MessageCircle className="size-5" /> {grade || withTka ? "Tanya program ini" : "Tanya admin"}
           </a>
         </div>
       </div>
@@ -133,7 +158,8 @@ export function ProgramExplorer() {
       <div className="grid gap-8 sm:grid-cols-2 lg:grid-cols-4 lg:gap-6">
         {PROGRAMS.map((p, i) => {
           const isMatch = matched.includes(p);
-          const dimmed = grade !== null && !isMatch;
+          // TKA tidak pernah diredupkan karena bisa diambil semua kelas
+          const dimmed = grade !== null && !isMatch && !p.anyGrade;
           return (
             <article
               key={p.title}
@@ -150,10 +176,14 @@ export function ProgramExplorer() {
                 <span className="grid size-7 place-items-center rounded-full bg-white text-navy">{p.tag}</span>
                 Program
               </span>
-              {isMatch && (
+              {isMatch ? (
                 <span className="absolute -top-4 right-3 z-10 animate-pop-in rounded-full bg-red px-3 py-1 text-xs font-extrabold text-white shadow-[0_3px_0_var(--color-red-600)]">
                   Cocok!
                 </span>
+              ) : (
+                p.anyGrade && (
+                  <span className="absolute -top-4 right-3 z-10 rounded-full border-2 border-purple bg-white px-3 py-0.5 text-xs font-extrabold text-purple">Semua kelas</span>
+                )
               )}
               <div className="overflow-hidden rounded-2xl">
                 <Image
