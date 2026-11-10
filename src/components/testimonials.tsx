@@ -68,7 +68,7 @@ export function Testimonials() {
                 href={wa(`Halo admin RH Cemerlang, saya orang tua yang ${who}. Boleh konsultasi program yang cocok?`)}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="group/link inline-flex items-center gap-1 text-sm font-extrabold text-brand-orange-600 hover:underline"
+                className="group/link -my-2 inline-flex min-h-11 items-center gap-1 px-1 text-sm font-extrabold text-brand-orange-600 hover:underline"
               >
                 Konsultasi <ArrowRight className="size-4 transition-transform group-hover/link:translate-x-1" />
               </a>
@@ -87,16 +87,12 @@ export function Testimonials() {
         >
           <ChevronLeft className="size-5" />
         </button>
-        <div className="flex gap-2">
+        <div className="flex">
           {CASES.map((c, i) => (
-            <button
-              key={c.who}
-              type="button"
-              onClick={() => go(i)}
-              aria-label={`Kartu ${i + 1}`}
-              aria-current={i === active}
-              className={cn("h-2.5 rounded-full transition-all", i === active ? "w-7 bg-brand-orange" : "w-2.5 bg-navy/20 hover:bg-navy/40")}
-            />
+            // area ketuk 44px, titik visualnya tetap kecil
+            <button key={c.who} type="button" onClick={() => go(i)} aria-label={`Kartu ${i + 1}`} aria-current={i === active} className="group grid h-11 min-w-6 place-items-center px-1">
+              <span className={cn("block h-2.5 rounded-full transition-all", i === active ? "w-7 bg-brand-orange" : "w-2.5 bg-navy/20 group-hover:bg-navy/40")} />
+            </button>
           ))}
         </div>
         <button

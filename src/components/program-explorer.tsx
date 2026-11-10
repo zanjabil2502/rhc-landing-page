@@ -212,7 +212,7 @@ export function ProgramExplorer() {
                   href={wa(`Halo admin RH Cemerlang, saya ingin tanya program ${p.title} (kelas ${type}) untuk anak saya.`)}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="group/link mt-4 inline-flex items-center gap-1.5 font-extrabold text-navy underline-offset-4 hover:text-brand-orange hover:underline"
+                  className="group/link mt-2 inline-flex min-h-11 items-center gap-1.5 font-extrabold text-navy underline-offset-4 hover:text-brand-orange hover:underline"
                 >
                   Tanya program ini <ArrowRight className="size-4 transition-transform group-hover/link:translate-x-1" />
                 </a>

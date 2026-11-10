@@ -30,6 +30,7 @@ import { JsonLd } from "@/components/json-ld";
 import { FAQ_GROUPS } from "@/lib/faq";
 import { ADDRESS, CITY, MAPS_URL, OG_BASE, PHONE_INTL, SITE_DESCRIPTION, SITE_NAME, SITE_URL, STREET, WA_DAFTAR, WA_DISPLAY, wa } from "@/lib/site";
 import { ProgramExplorer } from "@/components/program-explorer";
+import { StickyCta } from "@/components/sticky-cta";
 import { Testimonials } from "@/components/testimonials";
 import { Check, SectionTitle, WaButton, delay, stagger } from "@/components/site-ui";
 import { buttonVariants } from "@/components/ui/button";
@@ -500,7 +501,7 @@ export default function Home() {
                 href={MAPS_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="absolute bottom-3 left-3 inline-flex items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-extrabold text-navy shadow-card transition-transform hover:-translate-y-0.5"
+                className="absolute bottom-3 left-3 inline-flex min-h-11 items-center gap-2 rounded-full bg-white px-4 py-2 text-sm font-extrabold text-navy shadow-card transition-transform hover:-translate-y-0.5"
               >
                 <MapPin className="size-4 fill-red text-white" /> Petunjuk arah
               </a>
@@ -529,12 +530,12 @@ export default function Home() {
         </section>
       </main>
 
-      {/* CTA sticky mobile */}
-      <div className="fixed inset-x-4 bottom-4 z-50 sm:hidden">
+      {/* CTA sticky mobile: menyingkir di section kontak yang sudah punya tombol WhatsApp besar */}
+      <StickyCta hideWhen="kontak">
         <WaButton text={WA_DAFTAR} className="pulse-ring w-full">
           Konsultasi Gratis via WhatsApp
         </WaButton>
-      </div>
+      </StickyCta>
     </>
   );
 }

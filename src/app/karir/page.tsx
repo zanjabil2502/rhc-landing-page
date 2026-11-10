@@ -3,6 +3,7 @@ import Image from "next/image";
 import { ArrowDown, BookOpenCheck, CalendarClock, ClipboardList, GraduationCap, HeartHandshake, Megaphone, NotebookPen, Pencil, Sparkles, Wallet } from "lucide-react";
 import { JsonLd } from "@/components/json-ld";
 import { ApplyForm, QualificationCheck } from "@/components/karir-apply";
+import { StickyCta } from "@/components/sticky-cta";
 import { CITY, OG_BASE, SITE_NAME, SITE_URL, STREET } from "@/lib/site";
 import { SectionTitle, delay, stagger } from "@/components/site-ui";
 import { buttonVariants } from "@/components/ui/button";
@@ -190,12 +191,12 @@ export default function KarirPage() {
         </div>
       </section>
 
-      {/* CTA sticky mobile */}
-      <div className="fixed inset-x-4 bottom-4 z-50 sm:hidden">
+      {/* CTA sticky mobile: menyingkir saat form lamaran terlihat supaya tidak menutupi isian */}
+      <StickyCta hideWhen="lamar">
         <a href="#lamar" className={cn(buttonVariants(), "pop pulse-ring h-12 w-full rounded-full px-6 text-base font-extrabold")}>
           Lamar Sekarang <ArrowDown className="size-5" />
         </a>
-      </div>
+      </StickyCta>
     </main>
   );
 }
